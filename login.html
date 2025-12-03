@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="css for login&chooR.css"/>
+        
+    </head>
+    <body>
+
+        <div class="container" id="loginPage">
+            <h1>Welcome Back!</h1>
+            <p>Please login to view our menu</p>
+            
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Enter your email" required>
+                <input type="password" id="password" placeholder="Enter your password" required>
+                <button  type="submit">Login </button>
+            </form>
+            <br>
+            <a href="register.html" style="color: rgb(214, 51, 30); text-decoration: underline;">Dont have account? Register here</a>
+
+        </div>
+
+        <script>
+           const loginForm = document.getElementById("loginForm");
+        
+        loginForm.addEventListener("submit", function(event) {
+            event.preventDefault(); 
+            
+            window.location.href = "chooseR.html"; 
+        });
+        </script>z
+        
+    </body>
+
+</html>
+
+
+

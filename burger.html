@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" type="text/css" href="MenuStyle.css"/>
+
+  <meta charset="UTF-8">
+  <title>Burger Menu</title>
+
+  <style>
+
+    .header {
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      background: #e74c3c;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    
+    .price {
+      font-weight: bold;
+      font-size: 18px;
+      color: #e74c3c;
+      margin: 8px 0;
+    }
+
+    .add-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.25s;
+    }
+
+    .add-btn:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <script src="js file.js"></script>
+
+
+  <div class="header">
+    btweety Menu
+    <button class="cart-btn" onclick="goToCart()">🛒 </button>
+  </div>
+
+  <div class="menu-container" id="menuGrid"></div>
+
+  <script>
+    
+    const items = [
+      burger1, burger2, burger3, burger4, burger5,
+      burger6, burger7, burger8, burger9, burger10
+    ];
+
+    const menuGrid = document.getElementById("menuGrid");
+
+   items.forEach(item => menuGrid.appendChild(createCard(item)));
+
+  </script>
+
+</body>
+</html>

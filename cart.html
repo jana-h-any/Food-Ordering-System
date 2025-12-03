@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="cartStyle.css"/>
+
+  <meta charset="UTF-8">
+  <title>Shopping Cart</title>
+  
+</head>
+<body>
+
+  <div class="header">🛒 Your Cart</div>
+
+  <div class="cart-container">
+    <table id="cartTable">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
+    <div class="total" id="totalPrice">Total: 0 EGP</div>
+    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+  </div>
+
+  <script>
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const tableBody = document.querySelector("#cartTable tbody");
+    const totalPriceEl = document.getElementById("totalPrice");
+
+    function renderCart() {
+      tableBody.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        total += item.price * item.quantity;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><img src="${item.image}" alt="${item.name}"></td>
+          <td>${item.name}</td>
+          <td>${item.price} EGP</td>
+          <td>${item.quantity}</td>
+          <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      totalPriceEl.textContent = "Total: " + total + " EGP";
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCart();
+    }
+
+    function checkout() {
+      if(cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      alert("Thank you for your purchase! Total: " + cart.reduce((acc, item) => acc + item.price * item.quantity, 0) + " EGP");
+      cart = [];
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCart();
+    }
+
+    renderCart();
+  </script>
+
+</body>
+</html>

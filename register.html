@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="css for login&chooR.css"/>
+    <title>Register</title>
+</head>
+<body>
+
+    <div class="container" id="registerPage">
+        <h1>Create Account</h1>
+        <p>Fill in the details to register</p>
+        
+        <form id="registerForm">
+            <input type="text" id="name" placeholder="Enter your full name" required>
+            <input type="tel" id="phone" placeholder="Enter your phone number" required>
+            <input type="email" id="email" placeholder="Enter your email" required>
+            <input type="password" id="password" placeholder="Enter your password" required>
+            <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+            <button type="submit">Register</button>
+        </form>
+        <br>
+        <a href="login.html" style="color: rgb(214, 51, 30); text-decoration: underline;">Already have account? Login here</a>
+    </div>
+    
+    <script>
+        const registerForm = document.getElementById("registerForm");
+
+        registerForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            if(password !== confirmPassword){
+                alert("Passwords do not match!");
+                return;
+            }
+
+          alert("Registration successful!");
+            window.location.href = "login.html"; 
+        });
+    </script>
+
+</body>
+</html>

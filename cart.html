@@ -13,6 +13,8 @@
 
   <div class="cart-container">
     <table id="cartTable">
+      
+<thead>Cart</thead>
       <thead>
         <tr>
           <th>Item</th>
@@ -31,7 +33,6 @@
   </div>
 
   <script>
-
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     const tableBody = document.querySelector("#cartTable tbody");
@@ -49,18 +50,39 @@
           <td><img src="${item.image}" alt="${item.name}"></td>
           <td>${item.name}</td>
           <td>${item.price} EGP</td>
-          <td>${item.quantity}</td>
+          <td>
+            <div class="quantity-controls">
+              <button onclick="decreaseQuantity(${index})">-</button>
+              ${item.quantity}
+              <button onclick="increaseQuantity(${index})">+</button>
+            </div>
+          </td>
           <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
         `;
         tableBody.appendChild(row);
       });
 
       totalPriceEl.textContent = "Total: " + total + " EGP";
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    function increaseQuantity(index) {
+      cart[index].quantity += 1;
+      renderCart();
+    }
+
+    function decreaseQuantity(index) {
+      if(cart[index].quantity > 1) {
+        cart[index].quantity -= 1;
+        renderCart();
+      } else {
+        // لو حبيت ممكن تحذفي العنصر لو وصل 0
+        removeItem(index);
+      }
     }
 
     function removeItem(index) {
       cart.splice(index, 1);
-      localStorage.setItem("cart", JSON.stringify(cart));
       renderCart();
     }
 
@@ -71,7 +93,6 @@
       }
       alert("Thank you for your purchase! Total: " + cart.reduce((acc, item) => acc + item.price * item.quantity, 0) + " EGP");
       cart = [];
-      localStorage.setItem("cart", JSON.stringify(cart));
       renderCart();
     }
 

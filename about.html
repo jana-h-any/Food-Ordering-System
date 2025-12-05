@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BTWEETY - About</title>
+    <style>
+        :root {
+            --primary-color: #1c1c1c;
+            --secondary-color: #f39c12;
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+
+        main {
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            position: relative;
+        }
+
+        h2 {
+            font-size: 32px;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .section {
+            background: #2c2c2c;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .section p, .section ul {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .team-list {
+    display: flex;
+    flex-direction: column; 
+    gap: 15px; 
+    max-width: 600px; 
+    margin: 0 auto; 
+}
+
+.team-member {
+    background: #1c1c1c;
+    padding: 15px 20px;
+    border-radius: 12px;
+    width: 100%; 
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+
+
+        .team-member h4 {
+            margin: 10px 0 5px 0;
+            color: var(--secondary-color);
+        }
+
+        .team-member p {
+            margin: 0;
+            font-size: 14px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">BTWEETY</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="about.html">ABOUT</a></li>
+                <li><a href="CHOOOSErES.html">MENU</a></li>
+                <li><a href="#">REVIEWS</a></li>
+                <li><a href="#" class="login-btn">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- About Project -->
+        <div class="section">
+            <h2>About the Project</h2>
+            <p>BTWEETY is a modern Food Ordering System designed to simplify the way users order their favorite meals online. 
+               The system allows users to browse restaurants, view menus, select meals, and place orders seamlessly. 
+               It aims to provide a user-friendly and fast experience while connecting customers with local restaurants.</p>
+        </div>
+
+        <!-- Technologies Used -->
+        <div class="section">
+            <h2>Technologies Used</h2>
+            <ul>
+                <li>HTML, CSS, JavaScript for the web interface</li>
+                <li>Responsive design for different devices</li>
+                <li>Backend: Node.js / PHP / any backend if used</li>
+            </ul>
+        </div>
+
+        <!-- Team Members -->
+        <div class="section">
+            <h2>BTWEETY Team</h2>
+            <div class="team-list">
+                <div class="team-member">
+                    <h4>Jana Hany</h4>
+                    <p>ID: 692300278</p>
+                </div>
+                <div class="team-member">
+                    <h4> Joseph Nabil</h4>
+                    <p>ID: 692300217</p>
+                </div>
+                <div class="team-member">
+                    <h4>Menna Saeed</h4>
+                    <p>ID: 692300280</p>
+                </div>
+                <div class="team-member">
+                    <h4>Mariam Mohamed</h4>
+                    <p>ID: 692300216</p>
+                </div>
+                <div class="team-member">
+                    <h4>Basel Tamer</h4>
+                    <p>ID: 692300</p>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+</body>
+</html>

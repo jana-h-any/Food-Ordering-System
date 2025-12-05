@@ -1,45 +1,178 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="css for login&chooR.css"/>
-    <title>Register</title>
+
+    <title>BTWEETY - Register</title>
+    <style>
+        :root {
+            --primary-color: #1c1c1c;
+            --secondary-color: #f0b133;
+            --text-color: #ffffff;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            position: relative;
+        }
+
+        /* Header & Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+        nav ul li {
+            margin-left: 20px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+        .login-btn {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* Layout */
+        main {
+            display: flex;
+            padding: 50px;
+            align-items: center;
+            height: calc(100vh - 80px);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Background on LEFT */
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 90%;
+            background: url("assets/bww.png") no-repeat center center/cover;
+            clip-path: polygon(0 0, 90% 0, 100% 100%, 0% 100%);
+        }
+
+        .content {
+            flex: 1;
+            padding-left: 55%;
+        }
+
+        .content h1 {
+            font-size: 48px;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+        .content p {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* Form */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            width: 350px;
+        }
+
+        .login-form input {
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 15px;
+            background-color: #2c2c2c;
+            color: white;
+        }
+        .login-form input::placeholder {
+            color: #bbbbbb;
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .login-form button:hover {
+            background-color: #d35400;
+        }
+/* Animation: Background slides in from left */
+.background-image {
+    animation: slideIn 1s ease-out forwards;
+    transform: translateX(-100%);
+}
+
+@keyframes slideIn {
+    to {
+        transform: translateX(0);
+    }
+}
+
+    </style>
 </head>
 <body>
 
-    <div class="container" id="registerPage">
-        <h1>Create Account</h1>
-        <p>Fill in the details to register</p>
-        
-        <form id="registerForm">
-            <input type="text" id="name" placeholder="Enter your full name" required>
-            <input type="tel" id="phone" placeholder="Enter your phone number" required>
-            <input type="email" id="email" placeholder="Enter your email" required>
-            <input type="password" id="password" placeholder="Enter your password" required>
-            <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+<header>
+    <div class="logo">BTWEETY</div>
+    <nav>
+        <ul>
+            <li><a href="#">HOME</a></li>
+            <li><a href="#">ABOUT</a></li>
+            <li><a href="#">MENU</a></li>
+            <li><a href="#">REVIEWS</a></li>
+            <li><a href="#">BLOG</a></li>
+            <li><a href="splashStyle.html" class="login-btn">Login</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <div class="background-image"></div>
+
+    <div class="content">
+        <h1>Register</h1>
+        <p>Create your account to start ordering your favorite meals!</p>
+
+        <form class="login-form">
+            <input type="text" placeholder="Full Name" required>
+            <input type="email" placeholder="Email" required>
+            <input type="text" placeholder="Phone" required>
+            <input type="password" placeholder="Password" required>
+            <input type="password" placeholder="Confirm Password" required>
             <button type="submit">Register</button>
         </form>
+
         <br>
-        <a href="login.html" style="color: rgb(214, 51, 30); text-decoration: underline;">Already have account? Login here</a>
+        <a href="splashStyle.html" style="color:#a3a09a;">Already have an account? Login here</a>
     </div>
-    
-    <script>
-        const registerForm = document.getElementById("registerForm");
+</main>
 
-        registerForm.addEventListener("submit", function(event) {
-            event.preventDefault();
-
-            const password = document.getElementById("password").value;
-            const confirmPassword = document.getElementById("confirmPassword").value;
-
-            if(password !== confirmPassword){
-                alert("Passwords do not match!");
-                return;
-            }
-
-          alert("Registration successful!");
-            window.location.href = "login.html"; 
-        });
-    </script>
 
 </body>
 </html>

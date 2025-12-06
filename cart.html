@@ -1,103 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="cartStyle.css"/>
-
-  <meta charset="UTF-8">
-  <title>Shopping Cart</title>
-  
+    <meta charset="UTF-8">
+    <title>BTWEETY - Shopping Cart</title>
+    <link rel="stylesheet" href="cartStyle.css">
 </head>
 <body>
 
-  <div class="header">🛒 Your Cart</div>
+<header>
+    <div class="logo">BTWEETY</div>
+    <nav>
+        <ul>
+            <li><a href="home.html">HOME</a></li>
+            <li><a href="about.html">ABOUT</a></li>
+            <li><a href="CHOOOSErES.html">MENU</a></li>
+            <li><a href="history.html">History</a></li>
+            <li class="logout-icon">
+              <a href="#" onclick="logout()">
+                  <img src="assets/icons/wexit.png" alt="Logout">
+              </a>
+          </li>
 
-  <div class="cart-container">
+        </ul>
+    </nav>
+</header>
+
+<div class="cart-container">
     <table id="cartTable">
-      
-<thead>Cart</thead>
-      <thead>
-        <tr>
-          <th>Item</th>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
     </table>
 
     <div class="total" id="totalPrice">Total: 0 EGP</div>
     <button class="checkout-btn" onclick="checkout()">Checkout</button>
-  </div>
+</div>
 
-  <script>
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+<script >
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+const tableBody = document.querySelector("#cartTable tbody");
+const totalPriceEl = document.getElementById("totalPrice");
 
-    const tableBody = document.querySelector("#cartTable tbody");
-    const totalPriceEl = document.getElementById("totalPrice");
+function renderCart() {
+    tableBody.innerHTML = "";
+    let total = 0;
 
-    function renderCart() {
-      tableBody.innerHTML = "";
-      let total = 0;
-
-      cart.forEach((item, index) => {
+    cart.forEach((item, index) => {
         total += item.price * item.quantity;
 
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td><img src="${item.image}" alt="${item.name}"></td>
-          <td>${item.name}</td>
-          <td>${item.price} EGP</td>
-          <td>
-            <div class="quantity-controls">
-              <button onclick="decreaseQuantity(${index})">-</button>
-              ${item.quantity}
-              <button onclick="increaseQuantity(${index})">+</button>
-            </div>
-          </td>
-          <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
+            <td><img src="${item.image}" alt="${item.name}"></td>
+            <td>${item.name}</td>
+            <td>${item.price} EGP</td>
+            <td>
+                <div class="quantity-controls">
+                    <button onclick="decreaseQuantity(${index})">-</button>
+                    ${item.quantity}
+                    <button onclick="increaseQuantity(${index})">+</button>
+                </div>
+            </td>
+            <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
         `;
         tableBody.appendChild(row);
-      });
+    });
 
-      totalPriceEl.textContent = "Total: " + total + " EGP";
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
+    totalPriceEl.textContent = "Total: " + total + " EGP";
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
 
-    function increaseQuantity(index) {
-      cart[index].quantity += 1;
-      renderCart();
-    }
+function increaseQuantity(index) {
+    cart[index].quantity += 1;
+    renderCart();
+}
 
-    function decreaseQuantity(index) {
-      if(cart[index].quantity > 1) {
+function decreaseQuantity(index) {
+    if(cart[index].quantity > 1) {
         cart[index].quantity -= 1;
-        renderCart();
-      } else {
-        // لو حبيت ممكن تحذفي العنصر لو وصل 0
+    } else {
         removeItem(index);
-      }
     }
+    renderCart();
+}
 
-    function removeItem(index) {
-      cart.splice(index, 1);
-      renderCart();
-    }
+function removeItem(index) {
+    cart.splice(index, 1);
+    renderCart();
+}
 
-    function checkout() {
-      if(cart.length === 0) {
+async function checkout() {
+    if(cart.length === 0){
         alert("Your cart is empty!");
         return;
-      }
-      alert("Thank you for your purchase! Total: " + cart.reduce((acc, item) => acc + item.price * item.quantity, 0) + " EGP");
-      cart = [];
-      renderCart();
     }
 
+    const userId = localStorage.getItem("userId");
+    if(!userId){
+        alert("Please login first!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    // group items by restaurantId
+    const ordersByRestaurant = cart.reduce((acc, item) => {
+        if(!acc[item.restaurantId]) acc[item.restaurantId] = [];
+        acc[item.restaurantId].push(item);
+        return acc;
+    }, {});
+
+    try {
+        for(const restaurantId in ordersByRestaurant){
+            const items = ordersByRestaurant[restaurantId];
+            const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+            const orderData = {
+                userId: parseInt(userId),
+                restaurantId: parseInt(restaurantId),
+                items: items.map(i => ({
+                    menuItemId: i.id,
+                    quantity: i.quantity,
+                    price: i.price
+                })),
+                totalPrice
+            };
+
+            const response = await fetch("http://localhost:3000/create-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(orderData)
+            });
+
+            const result = await response.json();
+            if(!result.success){
+                alert("Error placing order for restaurant " + restaurantId);
+            }
+        }
+
+        alert("All orders placed successfully!");
+        cart = [];
+        localStorage.setItem("cart", JSON.stringify(cart));
+        renderCart();
+
+    } catch(err) {
+        console.error(err);
+        alert("Failed to connect to server");
+    }
+}
+
+// عند إضافة عنصر جديد للـ cart، تأكد إنك تضيف restaurantId:
+function addToCart(menuItem, restaurantId){
+    const item = {
+        id: menuItem.Id,
+        name: menuItem.Name,
+        price: menuItem.Price,
+        image: menuItem.Image,
+        quantity: 1,
+        restaurantId: restaurantId
+    };
+    cart.push(item);
     renderCart();
-  </script>
+}
+
+renderCart();
+
+
+function logout() {
+  const confirmLogout = confirm("Are you sure you want to log out?");
+
+  if (confirmLogout) {
+      localStorage.removeItem("loggedIn");   
+      window.location.href = "logIn.html"; 
+  }
+}
+</script>
 
 </body>
 </html>

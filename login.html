@@ -1,39 +1,100 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="css for login&chooR.css"/>
-        
-        
-    </head>
-    <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BTWEETY - Login</title>
+    <link rel="stylesheet" href="style.css">
 
-        <div class="container" id="loginPage">
-            <h1>Welcome Back!</h1>
-            <p>Please login to view our menu</p>
-            
-            <form id="loginForm">
-                <input type="email" id="email" placeholder="Enter your email" required>
-                <input type="password" id="password" placeholder="Enter your password" required>
-                <button  type="submit">Login </button>
-            </form>
-            <br>
-            <a href="register.html" style="color: rgb(214, 51, 30); text-decoration: underline;">Dont have account? Register here</a>
+</head>
 
-        </div>
+<body class="login-page">
 
-        <script>
-           const loginForm = document.getElementById("loginForm");
-        
-        loginForm.addEventListener("submit", function(event) {
-            event.preventDefault(); 
-            
-            window.location.href = "chooseR.html"; 
+<header>
+    <div class="logo">BTWEETY</div>
+    <nav>
+        <ul>
+            <li><a href="home.html">HOME</a></li>
+            <li><a href="about.html">ABOUT</a></li>
+            <li><a href="#">MENU</a></li>
+            <li><a id="go-register" href="#" class="login-btn">Register</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <div class="content">
+        <h1>Login</h1>
+        <p>Welcome back! Please login to your account.</p>
+
+        <form id="loginForm" class="login-form">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit" class="order-btn">Login</button>
+        </form>
+        <br>
+    </div>
+
+    <div class="background-image"></div>
+</main>
+
+<script>
+
+const form = document.getElementById("loginForm");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = form.email.value.trim();
+    const password = form.password.value.trim();
+
+    if(!email || !password){
+        alert("All fields are required");
+        return;
+    }
+
+    try {
+        const res = await fetch("http://localhost:3000/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
         });
-        </script>z
+
+        const result = await res.json();
+        alert(result.message);
+
+        if(res.ok){
+
+            localStorage.setItem("userId", result.userId);
+            localStorage.setItem("loggedIn", "true");
+
+            // Redirect to home page or dashboard
+            window.location.href = "CHOOOSErES.html";
+        }
+
+    } catch(err) {
+        console.error(err);
+        alert("Error logging in");
+    }
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
         
-    </body>
+        const goRegister = document.getElementById("go-register");
+    
+        goRegister.addEventListener("click", function (e) {
+            e.preventDefault(); 
+    
+            document.body.classList.add("animate-out");
+    
+            setTimeout(() => {
+                window.location.href = "register.html";
+            }, 500);
+        });
+    
+    });
+    
+</script>
 
+</body>
 </html>
-
-
-

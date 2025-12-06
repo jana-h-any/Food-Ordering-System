@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BTWEETY - Order History</title>
+    <link rel="stylesheet" href="cartStyle.css">
+    
+    <style>
+ .history-container {
+    padding: 10px;
+}
+
+#ordersList {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px;
+    justify-items: center;
+}
+
+.order {
+    border: 1px solid #ccc;
+    padding: 20px 30px;
+    border-radius: 12px;
+    background-color: #2c2c2c;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    width: 320px;
+}
+        
+        .order-items {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+.order-items li {
+    color: #fff;
+    margin-bottom: 5px;
+}   
+
+
+        
+        .order h3 {
+            color: #f39c12; /* Order # بالبرتقالي */
+        }
+        
+        .order-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 200px;
+        }
+        
+        .order-item img {
+            width: 260px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        
+        .order-item p {
+            color: #fff; /* تفاصيل العنصر أبيض */
+            margin: 2px 0;
+        }
+        .txt{
+            color: white;
+        }
+        .order p{
+            color: white;
+        }
+        </style>
+
+
+</head>
+<body>
+<header>
+    <div class="logo">BTWEETY</div>
+    <nav>
+        <ul>
+            <li><a href="home.html">HOME</a></li>
+            <li><a href="about.html">ABOUT</a></li>
+            <li><a href="CHOOOSErES.html">MENU</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="cart.html">CART 🛒</a></li>
+            <li class="logout-icon">
+                <a href="#" onclick="logout()">
+                    <img src="assets/icons/wexit.png" alt="Logout">
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<main class="history-container">
+    <center>
+    <h2 class="txt">Your Past Orders</h2>
+</center>
+    <div id="ordersList"></div>
+</main>
+
+<script >
+    
+async function loadHistory() {
+    const userId = localStorage.getItem("userId");
+    if(!userId){
+        alert("Please login first!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const res = await fetch(`http://localhost:3000/user-orders?userId=${userId}`);
+        const data = await res.json();
+
+        if(!data.success){
+            console.error(data.error);
+            return;
+        }
+
+        const container = document.getElementById("ordersList");
+        container.innerHTML = "";
+
+        if(data.orders.length === 0){
+            container.innerHTML = "<p>No past orders found.</p>";
+            return;
+        }
+
+        data.orders.forEach(order => {
+    const orderDiv = document.createElement("div");
+    orderDiv.classList.add("order");
+
+    // تحويل التاريخ إلى صيغة readable
+    const date = new Date(order.CreatedAt);
+    const formattedDate = date.toLocaleString();
+
+    let html = `
+        <h3>Order #${order.Id}</h3>
+        <p><strong>Restaurant:</strong> ${order.RestaurantName}</p>
+        <p><strong>Date:</strong> ${formattedDate}</p>
+        <p><strong>Status:</strong> ${order.Status}</p>
+        <p><strong>Total Price:</strong> ${order.TotalPrice} EGP</p>
+        <ul class="order-items">
+    `;
+
+    order.items.forEach(item => {
+        html += `<li>${item.Name} - ${item.Quantity} x ${item.Price} EGP</li>`;
+    });
+
+    html += "</ul>";
+    orderDiv.innerHTML = html;
+    container.appendChild(orderDiv);
+});
+
+
+
+    } catch(err){
+        console.error(err);
+        alert("Failed to load order history");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadHistory);
+</script>
+
+</body>
+</html>

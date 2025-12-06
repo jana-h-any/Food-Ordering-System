@@ -1,20 +1,46 @@
+
+:root {
+  --primary-color: #1c1c1c;
+  --secondary-color: #f0b133;
+  --text-color: #ffffff;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 50px;
+}
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--secondary-color);
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+nav ul li {
+  margin-left: 20px;
+}
+nav ul li a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: bold;
+  transition: color 0.3s;
+}
+nav ul li a:hover {
+  color: var(--secondary-color);
+}
+
 body {
     margin: 0;
     font-family: "Poppins", sans-serif;
     background:#1c1c1c ;
   }
 
-  .header {
-    width: 100%;
-    padding: 20px;
-    text-align: center;
-    background: #e74c3c;
-    color: white;
-    font-size: 28px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  }
 
   .cart-container {
     max-width: 900px;
@@ -50,7 +76,7 @@ body {
   }
 
   .remove-btn {
-    background: #e74c3c;
+    background: #f0b133;
     color: white;
     border: none;
     padding: 6px 12px;
@@ -60,7 +86,7 @@ body {
   }
 
   .remove-btn:hover {
-    background: #c0392b;
+    background: #f0b133;
   }
 
   .total {
@@ -72,7 +98,7 @@ body {
   }
 
   .checkout-btn {
-    background: #b5321b;
+    background: #f0b133;
     color: white;
     border: none;
     padding: 12px 25px;
@@ -87,3 +113,20 @@ body {
   .checkout-btn:hover {
     background: #5d2020;
   }
+
+  
+
+.logout-icon img {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.logout-icon img:hover {
+  transform: scale(1.15);
+  filter: brightness(0) saturate(100%) 
+  invert(63%) sepia(94%) saturate(480%) 
+  hue-rotate(359deg) brightness(101%) contrast(104%);
+
+}

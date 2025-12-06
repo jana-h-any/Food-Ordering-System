@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>BTWEETY - About</title>
+
     <style>
         :root {
             --primary-color: #1c1c1c;
@@ -105,20 +106,53 @@
             font-size: 14px;
             color: #ccc;
         }
+
+        .login-btn {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.logout-icon img:hover {
+    transform: scale(1.15);
+    filter: brightness(0) saturate(100%) 
+    invert(63%) sepia(94%) saturate(480%) 
+    hue-rotate(359deg) brightness(101%) contrast(104%);
+
+}
+
     </style>
 </head>
 <body>
     <header>
         <div class="logo">BTWEETY</div>
-        <nav>
-            <ul>
-                <li><a href="index.html">HOME</a></li>
+        <nav id="guest-section">
+            <ul >
+                <li><a href="home.html">HOME</a></li>
                 <li><a href="about.html">ABOUT</a></li>
-                <li><a href="CHOOOSErES.html">MENU</a></li>
-                <li><a href="#">REVIEWS</a></li>
-                <li><a href="#" class="login-btn">Login</a></li>
+                <li><a href="#">MENU</a></li>
+                <li ><a id="go-register" href="logIn.html" class="login-btn">LOGIN</a></li>
             </ul>
         </nav>
+    <nav id="logged-section">
+    
+            <ul >
+                <li><a href="home.html">HOME</a></li>
+                <li><a href="about.html">ABOUT</a></li>
+                <li><a href="CHOOOSErES.html">MENU</a></li>
+                <li><a href="history.html">HISTORY</a></li>
+                <li class="logout-icon">
+                    <a href="#" onclick="logout()">
+                        <img src="assets/icons/wexit.png" alt="Logout">
+                    </a>
+                </li>
+                
+            </ul>
+        </nav>
+    
     </header>
 
     <main>
@@ -162,11 +196,13 @@
                 </div>
                 <div class="team-member">
                     <h4>Basel Tamer</h4>
-                    <p>ID: 692300</p>
+                    <p>ID: 692300055</p>
                 </div>
                 
             </div>
         </div>
     </main>
+    <script src="js file.js"></script>
+
 </body>
 </html>

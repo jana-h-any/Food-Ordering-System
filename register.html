@@ -1,153 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
+    <meta charset="UTF-8">
     <title>BTWEETY - Register</title>
-    <style>
-        :root {
-            --primary-color: #1c1c1c;
-            --secondary-color: #f0b133;
-            --text-color: #ffffff;
-        }
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            position: relative;
-        }
-
-        /* Header & Navigation */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 50px;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-        nav ul {
-            list-style: none;
-            display: flex;
-            margin: 0;
-            padding: 0;
-        }
-        nav ul li {
-            margin-left: 20px;
-        }
-        nav ul li a {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: bold;
-        }
-        nav ul li a:hover {
-            color: var(--secondary-color);
-        }
-        .login-btn {
-            background-color: var(--secondary-color);
-            color: var(--primary-color);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        /* Layout */
-        main {
-            display: flex;
-            padding: 50px;
-            align-items: center;
-            height: calc(100vh - 80px);
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Background on LEFT */
-        .background-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 50%;
-            height: 90%;
-            background: url("assets/bww.png") no-repeat center center/cover;
-            clip-path: polygon(0 0, 90% 0, 100% 100%, 0% 100%);
-        }
-
-        .content {
-            flex: 1;
-            padding-left: 55%;
-        }
-
-        .content h1 {
-            font-size: 48px;
-            line-height: 1.2;
-            margin-bottom: 20px;
-        }
-        .content p {
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-
-        /* Form */
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            width: 350px;
-        }
-
-        .login-form input {
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: none;
-            margin-bottom: 15px;
-            background-color: #2c2c2c;
-            color: white;
-        }
-        .login-form input::placeholder {
-            color: #bbbbbb;
-        }
-
-        .login-form button {
-            width: 100%;
-            padding: 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            background-color: var(--secondary-color);
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        .login-form button:hover {
-            background-color: #d35400;
-        }
-/* Animation: Background slides in from left */
-.background-image {
-    animation: slideIn 1s ease-out forwards;
-    transform: translateX(-100%);
-}
-
-@keyframes slideIn {
-    to {
-        transform: translateX(0);
-    }
-}
-
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="register-page">
 
 <header>
     <div class="logo">BTWEETY</div>
     <nav>
         <ul>
-            <li><a href="#">HOME</a></li>
-            <li><a href="#">ABOUT</a></li>
+            <li><a href="home.html">HOME</a></li>
+            <li><a href="about.html">ABOUT</a></li>
             <li><a href="#">MENU</a></li>
-            <li><a href="#">REVIEWS</a></li>
-            <li><a href="#">BLOG</a></li>
-            <li><a href="splashStyle.html" class="login-btn">Login</a></li>
+            
+            <li><a href="logIn.html" class="login-btn">Login</a></li>
         </ul>
     </nav>
 </header>
@@ -159,20 +27,70 @@
         <h1>Register</h1>
         <p>Create your account to start ordering your favorite meals!</p>
 
-        <form class="login-form">
-            <input type="text" placeholder="Full Name" required>
-            <input type="email" placeholder="Email" required>
-            <input type="text" placeholder="Phone" required>
-            <input type="password" placeholder="Password" required>
-            <input type="password" placeholder="Confirm Password" required>
+        <form id="registerForm" class="registerForm">
+            <input type="text" name="fullName" placeholder="Full Name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="text" name="phone" placeholder="Phone" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
             <button type="submit">Register</button>
         </form>
 
         <br>
-        <a href="splashStyle.html" style="color:#a3a09a;">Already have an account? Login here</a>
     </div>
 </main>
 
+<script>
+const form = document.getElementById("registerForm");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {
+        fullName: form.fullName.value.trim(),
+        email: form.email.value.trim(),
+        phone: form.phone.value.trim(),
+        password: form.password.value.trim(),
+        confirmPassword: form.confirmPassword.value.trim()
+    };
+
+    console.log(data);
+
+    if(!data.fullName || !data.email || !data.phone || !data.password || !data.confirmPassword) {
+        alert("All fields are required");
+        return;
+    }
+
+    if(data.password !== data.confirmPassword){
+        alert("Passwords do not match!");
+        return;
+    }
+
+    try {
+        const res = await fetch("http://localhost:3000/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: data.fullName,
+                email: data.email,
+                phone: data.phone,
+                password: data.password
+            })
+        });
+
+        const result = await res.json();
+        alert(result.message);
+
+        if(res.ok){
+            window.location.href = "logIn.html"; 
+        }
+
+    } catch(err) {
+        console.error(err);
+        alert("Error registering user");
+    }
+});
+</script>
 
 </body>
 </html>

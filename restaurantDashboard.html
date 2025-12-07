@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Restaurant Dashboard - Orders</title>
+
+<style>
+/* ===== ROOT & BODY ===== */
+body.dashboard-page {
+    margin: 0;
+    font-family: "Poppins", Arial, sans-serif;
+    background-color: #1c1c1c;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background-color: #1c1c1c;
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid #333;
+}
+
+.logo {
+    color: #f0b133;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    color: #f0b133;
+}
+
+.logout-icon img {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.logout-icon img:hover {
+    transform: scale(1.15);
+    filter: brightness(0) saturate(100%) 
+    invert(63%) sepia(94%) saturate(480%) 
+    hue-rotate(359deg) brightness(101%) contrast(104%);}
+
+/* ===== PAGE TITLE ===== */
+.page-title {
+    text-align: center;
+    color: #f0b133;
+    margin: 25px 0 10px 0;
+    font-size: 28px;
+}
+
+/* ===== MAIN CONTAINER ===== */
+main.dashboard-container {
+    padding: 30px 20px;
+}
+
+/* ===== ORDERS GRID ===== */
+#ordersList {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    justify-items: center;
+}
+
+/* ===== ORDER CARD ===== */
+.order-card {
+    border: 1px solid #444;
+    padding: 20px 30px;
+    border-radius: 12px;
+    background-color: #2c2c2c;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    width: 320px;
+}
+
+.order-card h3 {
+    color: #f39c12;
+    margin-bottom: 10px;
+}
+
+.order-card p {
+    color: white;
+    margin: 6px 0;
+}
+
+.order-card ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+.order-card ul li {
+    color: white;
+    margin-bottom: 5px;
+}
+
+/* ===== STATUS SELECT ===== */
+.status-select {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #666;
+    background: #1f1f1f;
+    color: white;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    #ordersList {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    #ordersList {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+</style>
+</head>
+
+<body class="dashboard-page">
+
+<header>
+    <div class="logo">BTWEETY</div>
+    <nav>
+        <ul>
+            <li><a href="#">ORDERS</a></li>
+            <li><a href="addItem.html">ADD ITEM</a></li>
+            <li>
+                <a class="logout-icon" id="logoutBtn" href="#">
+                    <img src="assets/icons/wexit.png" alt="Logout">
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<h2 class="page-title">Orders</h2>
+
+<main class="dashboard-container">
+    <div id="ordersList"></div>
+</main>
+
+<script>
+const restaurantId = localStorage.getItem('restaurantId');
+if(!restaurantId) window.location.href = 'restaurant-login.html';
+
+const ordersList = document.getElementById('ordersList');
+
+async function fetchOrders(){
+    const res = await fetch(`http://localhost:3000/restaurant-orders?restaurantId=${restaurantId}`);
+    const data = await res.json();
+
+    if(data.success){
+        ordersList.innerHTML = '';
+
+        data.orders.forEach(order => {
+            const div = document.createElement('div');
+            div.classList.add('order-card');
+
+            div.innerHTML = `
+                <h3>Order #${order.Id}</h3>
+                <p><strong>Customer:</strong> ${order.CustomerName}</p>
+                <p><strong>Phone:</strong> ${order.Phone}</p>
+                <p><strong>Total:</strong> ${order.TotalPrice} EGP</p>
+                <p><strong>Items:</strong></p>
+                <ul>
+                    ${order.items.map(i => `<li>${i.ItemName} x${i.Quantity}</li>`).join('')}
+                </ul>
+
+                <p><strong>Status:</strong></p>
+                <select class="status-select" data-orderid="${order.Id}">
+                    <option value="Pending" ${order.Status === 'Pending' ? 'selected' : ''}>Pending</option>
+                    <option value="In Progress" ${order.Status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                    <option value="Delivered" ${order.Status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                </select>
+            `;
+
+            ordersList.appendChild(div);
+        });
+
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', async () => {
+                const orderId = select.dataset.orderid;
+                const status = select.value;
+
+                await fetch('http://localhost:3000/update-order-status', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId, status })
+                });
+            });
+        });
+    }
+}
+
+fetchOrders();
+setInterval(fetchOrders, 5000);
+
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    localStorage.removeItem('restaurantId');
+    window.location.href = 'restaurant-login.html';
+});
+</script>
+
+</body>
+</html>

@@ -166,6 +166,17 @@ async function loadHistory() {
 }
 
 document.addEventListener("DOMContentLoaded", loadHistory);
+
+
+function logout() {
+  const confirmLogout = confirm("Are you sure you want to log out?");
+
+  if (confirmLogout) {
+      localStorage.removeItem("loggedIn"); 
+      localStorage.removeItem("userId");     
+      window.location.href = "logIn.html"; 
+  }
+}
 </script>
 
 </body>

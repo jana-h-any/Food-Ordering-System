@@ -52,27 +52,24 @@ function logout() {
 
   if (confirmLogout) {
       localStorage.removeItem("loggedIn");   
+      localStorage.removeItem("userId");   
       window.location.href = "logIn.html"; 
   }
 }
 
-if (localStorage.getItem("loggedIn")) {
-  // user logged in
-  document.getElementById("logged-section").style.display = "block";
-  document.getElementById("logged-butt").style.display = "block";
+const loggedSection = document.querySelector(".logged-section");
+const guestSection = document.querySelector(".guest-section");
 
-  document.getElementById("guest-section").style.display = "none";
-  document.getElementById("guest-butt").style.display = "none";
-
-} else {
-  // user not logged in
-  document.getElementById("logged-section").style.display = "none";
-  document.getElementById("logged-butt").style.display = "none";
-
-  document.getElementById("guest-section").style.display = "block";
-  document.getElementById("guest-butt").style.display = "block";
-
+if (loggedSection && guestSection) {
+  if (localStorage.getItem("loggedIn")) {
+    loggedSection.style.display = "block";
+    guestSection.style.display = "none";
+  } else {
+    loggedSection.style.display = "none";
+    guestSection.style.display = "block";
+  }
 }
+
 
 function guestExplore() {
   alert("Please login first to explore restaurants!");

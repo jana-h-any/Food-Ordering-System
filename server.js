@@ -198,5 +198,136 @@ app.post("/create-order", async (req, res) => {
 });
 
 
+// dashboard 
+
+app.post('/restaurant/login', async (req, res) => {
+    const { name, password } = req.body;
+
+    try {
+        const pool = await sql.connect(config);
+
+        const r = await pool.request()
+            .input('name', sql.VarChar, name)
+            .query("SELECT * FROM Restaurant WHERE Name=@name");
+
+        if(r.recordset.length === 0)
+            return res.status(400).json({ message: "Restaurant not found" });
+
+        const restaurant = r.recordset[0];
+
+        const isMatch = await bcrypt.compare(password, restaurant.Password);
+        if(!isMatch)
+            return res.status(400).json({ message: "Wrong password!" });
+
+        res.json({ message: "Login successful!", restaurantId: restaurant.Id });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+
+app.get('/restaurant-orders', async (req, res) => {
+    const restaurantId = req.query.restaurantId;
+    try{
+        const pool = await sql.connect(config);
+        const ordersResult = await pool.request()
+            .input('RestaurantId', sql.Int, restaurantId)
+            .query(`
+                SELECT o.*, u.Name AS CustomerName, u.Phone
+                FROM Orders o
+                JOIN [User] u ON o.UserId = u.Id
+                WHERE o.RestaurantId = @RestaurantId
+                ORDER BY o.Id DESC
+            `);
+
+        const orders = ordersResult.recordset;
+
+        for(const order of orders){
+            const itemsResult = await pool.request()
+                .input("OrderId", sql.Int, order.Id)
+                .query(`
+                    SELECT oi.*, mi.Name AS ItemName 
+                    FROM OrderItem oi 
+                    JOIN MenuItem mi ON oi.MenuItemId = mi.Id
+                    WHERE OrderId=@OrderId
+                `);
+            order.items = itemsResult.recordset;
+        }
+
+        res.json({ success: true, orders });
+
+    } catch(err){
+        console.error(err);
+        res.status(500).json({ success: false, error: err });
+    }
+});
+
+app.put('/update-order-status', async (req,res)=>{
+    const { orderId, status } = req.body;
+    try{
+        const pool = await sql.connect(config);
+        await pool.request()
+            .input('OrderId', sql.Int, orderId)
+            .input('Status', sql.VarChar, status)
+            .query('UPDATE Orders SET Status=@Status WHERE Id=@OrderId');
+        res.json({ success: true, message: "Order status updated" });
+    } catch(err){
+        console.error(err);
+        res.status(500).json({ success: false, error: err });
+    }
+});
+app.post('/restaurant/add-menu-item', async (req,res)=>{
+    const { restaurantId, name, price, image, category, description } = req.body;
+
+    try{
+        const pool = await sql.connect(config);
+
+        // الحصول على الـ Menu الخاصة بالمطعم
+        const menuResult = await pool.request()
+            .input('RestaurantId', sql.Int, restaurantId)
+            .query('SELECT * FROM Menu WHERE RestaurantId=@RestaurantId');
+
+        let menuId;
+
+        if(menuResult.recordset.length === 0){
+            const newMenu = await pool.request()
+                .input('RestaurantId', sql.Int, restaurantId)
+                .input('Name', sql.VarChar, 'Main Menu')
+                .query(`
+                    INSERT INTO Menu (RestaurantId, Name) 
+                    OUTPUT INSERTED.Id 
+                    VALUES (@RestaurantId, @Name)
+                `);
+            menuId = newMenu.recordset[0].Id;
+        } 
+        else {
+            menuId = menuResult.recordset[0].Id;
+        }
+
+        // إدراج الـ MenuItem بالقيم الجديدة
+        await pool.request()
+            .input('MenuId', sql.Int, menuId)
+            .input('Name', sql.VarChar, name)
+            .input('Price', sql.Decimal(10,2), price)
+            .input('Image', sql.VarChar, image)
+            .input('Category', sql.VarChar, category || null)
+            .input('Description', sql.VarChar, description || null)
+            .query(`
+                INSERT INTO MenuItem (MenuId, Name, Price, Image, Category, Description)
+                VALUES (@MenuId, @Name, @Price, @Image, @Category, @Description)
+            `);
+
+        res.json({ success:true, message:"Menu item added" });
+
+    } catch(err){
+        console.error(err);
+        res.status(500).json({ success:false, error:err });
+    }
+});
+
+//pass 
 
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
+

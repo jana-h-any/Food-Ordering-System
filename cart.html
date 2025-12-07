@@ -7,23 +7,33 @@
 </head>
 <body>
 
-<header>
-    <div class="logo">BTWEETY</div>
-    <nav>
-        <ul>
-            <li><a href="home.html">HOME</a></li>
-            <li><a href="about.html">ABOUT</a></li>
-            <li><a href="CHOOOSErES.html">MENU</a></li>
-            <li><a href="history.html">History</a></li>
-            <li class="logout-icon">
-              <a href="#" onclick="logout()">
-                  <img src="assets/icons/wexit.png" alt="Logout">
-              </a>
-          </li>
+    <header>
+        <div class="logo">BTWEETY</div>
+        <nav class="logged-section">
+            <ul>
+                <li><a href="home.html">HOME</a></li>
+                <li><a href="about.html">ABOUT</a></li>
+                <li><a href="CHOOOSErES.html">MENU</a></li>
+                <li><a href="history.html">HISTORY</a></li>
+                <li><a href="cart.html">CART 🛒</a></li>
+                <li class="logout-icon">
+                    <a href="#" onclick="logout()">
+                        <img src="assets/icons/wexit.png" alt="Logout">
+                    </a>
+                </li>
+            </ul>
 
-        </ul>
-    </nav>
-</header>
+        </nav>
+        <nav class="guest-section">
+            <ul >
+                <li><a href="home.html">HOME</a></li>
+                <li><a href="about.html">ABOUT</a></li>
+                <li><a href="CHOOOSErES.html">MENU</a></li>
+                <li><a href="cart.html">CART 🛒</a></li>
+                <li ><a id="go-register" href="logIn.html" class="login-btn">LOGIN</a></li>
+            </ul>
+        </nav>
+    </header>
 
 <div class="cart-container">
     <table id="cartTable">
@@ -106,7 +116,7 @@ async function checkout() {
         alert("Please login first!");
         window.location.href = "login.html";
         return;
-    }
+    }   
 
     // group items by restaurantId
     const ordersByRestaurant = cart.reduce((acc, item) => {
@@ -176,10 +186,12 @@ function logout() {
 
   if (confirmLogout) {
       localStorage.removeItem("loggedIn");   
+      localStorage.removeItem("userId");   
       window.location.href = "logIn.html"; 
   }
 }
 </script>
 
+<script src="js file.js"></script>
 </body>
 </html>

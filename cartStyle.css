@@ -130,3 +130,16 @@ body {
   hue-rotate(359deg) brightness(101%) contrast(104%);
 
 }
+
+
+.login-btn {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  text-decoration: none;
+}
+.login-btn:hover {
+  background-color: #d35400;
+}

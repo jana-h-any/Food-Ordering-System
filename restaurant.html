@@ -7,16 +7,16 @@
 </head>
 <body>
 
-<script src="js file.js"></script>
+
 
 <header>
     <div class="logo">BTWEETY</div>
-    <nav>
+    <nav class="logged-section">
         <ul>
-            <li><a href="index.html">HOME</a></li>
+            <li><a href="home.html">HOME</a></li>
             <li><a href="about.html">ABOUT</a></li>
             <li><a href="CHOOOSErES.html">MENU</a></li>
-            <li><a href="history.html">History</a></li>
+            <li><a href="history.html">HISTORY</a></li>
             <li><a href="cart.html">CART 🛒</a></li>
             <li class="logout-icon">
                 <a href="#" onclick="logout()">
@@ -24,49 +24,52 @@
                 </a>
             </li>
         </ul>
+
+    </nav>
+    <nav class="guest-section">
+        <ul >
+            <li><a href="home.html">HOME</a></li>
+            <li><a href="about.html">ABOUT</a></li>
+            <li><a href="CHOOOSErES.html">MENU</a></li>
+            <li><a href="cart.html">CART 🛒</a></li>
+            <li ><a id="go-register" href="logIn.html" class="login-btn">LOGIN</a></li>
+        </ul>
     </nav>
 </header>
 
 <div class="menu-container" id="menuGrid"></div>
 
 <script>
-// جلب الـ restaurantId من URL
 const params = new URLSearchParams(window.location.search);
-const restaurantId = params.get('id'); // مثال: restaurant.html?id=2
-
+const restaurantId = params.get('id'); 
 async function loadMenu(restaurantId) {
     try {
         const res = await fetch(`http://localhost:3000/menuitems?restaurantId=${restaurantId}`);
         const items = await res.json();
 
         const container = document.getElementById("menuGrid"); 
-        container.innerHTML = ""; // نصفر المحتوى القديم
+        container.innerHTML = ""; 
 
-        // تحديد كل الفئات الموجودة
         const categories = [...new Set(items.map(item => item.Category))];
 
         categories.forEach(category => {
-            // Container لكل فئة
+
             const categoryContainer = document.createElement("div");
             categoryContainer.classList.add("category-container");
 
-            // عنوان الفئة
             const sectionTitle = document.createElement("div");
             sectionTitle.classList.add("section-title");
             sectionTitle.textContent = category;
             categoryContainer.appendChild(sectionTitle);
 
-            // Grid للكروت
             const grid = document.createElement("div");
             grid.classList.add("menu-grid");
             categoryContainer.appendChild(grid);
 
-            // عناصر الفئة
             items
                 .filter(item => item.Category === category)
                 .forEach(item => grid.appendChild(createCard(item)));
 
-            // ضيف الفئة للـ main container
             container.appendChild(categoryContainer);
         });
 
@@ -83,6 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
-
+<script src="js file.js"></script>
 </body>
 </html>

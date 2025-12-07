@@ -4,32 +4,22 @@
     <meta charset="UTF-8">
     <title>BTWEETY - Login</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-       
- .background-image {
-    animation: slideIn 1s ease-out forwards;
-    transform: translateX(-100%);
-}
-@keyframes slideIn {
-    to {
-        transform: translateX(0);
-    }
-}
-</style>
+  
 </head>
 <body >
 
 <header>
     <div class="logo">BTWEETY</div>
-    <nav id="guest-section">
+    <nav class="guest-section">
         <ul >
             <li><a href="#">HOME</a></li>
             <li><a href="about.html">ABOUT</a></li>
-            <li><a href="#">MENU</a></li>
+            <li><a href="CHOOOSErES.html">MENU</a></li>
             <li ><a id="go-register" href="logIn.html" class="login-btn">LOGIN</a></li>
         </ul>
     </nav>
-<nav id="logged-section">
+    
+<nav class="logged-section">
 
         <ul >
             <li><a href="home.html">HOME</a></li>
@@ -53,17 +43,13 @@
             Hungry? <br>
             Let’s get your favorite meal delivered.
         </h1>
-    <div id="logged-butt">
+    <div>
         <div class="buttons">
             <a href="CHOOOSErES.html" class="order-btn">Explore Restaurants</a>
         </div>
     </div>
 
-    <div id="guest-butt">
-        <div class="buttons">
-            <a href="#" class="order-btn" onclick="guestExplore()">Explore Restaurants</a>
-        </div>
-    </div>
+   
     </div>
         <div class="background-image"></div>
 

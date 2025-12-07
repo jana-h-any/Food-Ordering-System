@@ -7,9 +7,10 @@
   
 </head>
 <body>
+    
     <header>
         <div class="logo">BTWEETY</div>
-        <nav>
+        <nav class="logged-section">
             <ul>
                 <li><a href="home.html">HOME</a></li>
                 <li><a href="about.html">ABOUT</a></li>
@@ -21,6 +22,16 @@
                         <img src="assets/icons/wexit.png" alt="Logout">
                     </a>
                 </li>
+            </ul>
+
+        </nav>
+        <nav class="guest-section">
+            <ul >
+                <li><a href="home.html">HOME</a></li>
+                <li><a href="about.html">ABOUT</a></li>
+                <li><a href="CHOOOSErES.html">MENU</a></li>
+                <li><a href="cart.html">CART 🛒</a></li>
+                <li ><a id="go-register" href="logIn.html" class="login-btn">LOGIN</a></li>
             </ul>
         </nav>
     </header>
@@ -92,12 +103,14 @@ function logout() {
   const confirmLogout = confirm("Are you sure you want to log out?");
 
   if (confirmLogout) {
-      localStorage.removeItem("loggedIn");   
+      localStorage.removeItem("loggedIn"); 
+      localStorage.removeItem("userId");   
+  
       window.location.href = "logIn.html"; 
   }
 }
 </script>
-
+<script src="js file.js"></script>
 
     </main>
     

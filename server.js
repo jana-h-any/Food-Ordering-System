@@ -2,6 +2,8 @@
 const express = require('express');
 const sql = require('mssql');
 const bcrypt = require('bcrypt');
+const multer = require("multer");
+const path = require("path");
 
 const app = express();
 const port = 3000;
@@ -122,44 +124,43 @@ app.get('/restaurants', async (req, res) => {
 });
 
 app.post("/create-order", async (req, res) => {
-    const { userId, restaurantId, items, totalPrice } = req.body;
-  
+    const { userId, restaurantId, addressId, items, totalPrice } = req.body; 
+
     try {
-      const pool = await sql.connect(config);
-  
-      // Step 1: Add order
-      const orderResult = await pool.request()
-        .input("UserId", sql.Int, userId)
-        .input("RestaurantId", sql.Int, restaurantId)
-        .input("TotalPrice", sql.Decimal(10,2), totalPrice)
-        .query(`
-          INSERT INTO Orders (UserId, RestaurantId, TotalPrice)
-          OUTPUT INSERTED.Id
-          VALUES (@UserId, @RestaurantId, @TotalPrice)
-        `);
-  
-      const orderId = orderResult.recordset[0].Id;
-  
-      for(const item of items) {
-        await pool.request()
-          .input("OrderId", sql.Int, orderId)
-          .input("MenuItemId", sql.Int, item.menuItemId)
-          .input("Quantity", sql.Int, item.quantity)
-          .input("Price", sql.Decimal(10,2), item.price)
-          .query(`
-            INSERT INTO OrderItem (OrderId, MenuItemId, Quantity, Price)
-            VALUES (@OrderId, @MenuItemId, @Quantity, @Price)
-          `);
-      }
-  
-      res.json({ success: true, orderId });
-  
+        const pool = await sql.connect(config);
+        const orderResult = await pool.request()
+            .input("UserId", sql.Int, userId)
+            .input("RestaurantId", sql.Int, restaurantId)
+            .input("AddressId", sql.Int, addressId) // <-- هنا
+            .input("TotalPrice", sql.Decimal(10,2), totalPrice)
+            .query(`
+                INSERT INTO Orders (UserId, RestaurantId, AddressId, TotalPrice)
+                OUTPUT INSERTED.Id
+                VALUES (@UserId, @RestaurantId, @AddressId, @TotalPrice)
+            `);
+
+        const orderId = orderResult.recordset[0].Id;
+
+        for(const item of items) {
+            await pool.request()
+                .input("OrderId", sql.Int, orderId)
+                .input("MenuItemId", sql.Int, item.menuItemId)
+                .input("Quantity", sql.Int, item.quantity)
+                .input("Price", sql.Decimal(10,2), item.price)
+                .query(`
+                    INSERT INTO OrderItem (OrderId, MenuItemId, Quantity, Price)
+                    VALUES (@OrderId, @MenuItemId, @Quantity, @Price)
+                `);
+        }
+
+        res.json({ success: true, orderId });
+
     } catch (err) {
-      console.log(err);
-      res.status(500).json({ success: false, error: err });
+        console.log(err);
+        res.status(500).json({ success: false, error: err });
     }
-  });
-  
+});
+
   app.get("/user-orders", async (req, res) => {
     const userId = req.query.userId;
     try {
@@ -198,7 +199,59 @@ app.post("/create-order", async (req, res) => {
 });
 
 
+app.get('/address/user', async (req,res)=>{
+    const userId = parseInt(req.query.userId);
+    try{
+        const pool = await sql.connect(config);
+        const result = await pool.request()
+            .input('UserId', sql.Int, userId)
+            .query('SELECT * FROM Address WHERE UserId=@UserId');
+        res.json(result.recordset);
+    } catch(err){
+        console.error(err);
+        res.status(500).json({success:false, error:err});
+    }
+});
+
+app.post('/address/add', async (req,res)=>{
+    const { userId, fullAddress, notes } = req.body; 
+    try{
+        const pool = await sql.connect(config);
+        await pool.request()
+            .input('UserId', sql.Int, userId)
+            .input('FullAddress', sql.VarChar, fullAddress)
+            .input('Notes', sql.VarChar, notes || null)
+            .query(`INSERT INTO Address (UserId, FullAddress, Notes)
+                    VALUES (@UserId, @FullAddress, @Notes)`);
+        res.json({success:true, message:"Address added successfully"});
+    } catch(err){
+        console.error(err);
+        res.status(500).json({success:false, error:err});
+    }
+});
+
 // dashboard 
+
+const menuStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/menu");
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `item_${Date.now()}${ext}`);
+    }
+});
+
+const uploadMenuImage = multer({
+    storage: menuStorage,
+    fileFilter: (req, file, cb) => {
+        if(!file.mimetype.startsWith("image/")){
+            return cb(new Error("Only images allowed"));
+        }
+        cb(null, true);
+    }
+});
+
 
 app.post('/restaurant/login', async (req, res) => {
     const { name, password } = req.body;
@@ -217,7 +270,7 @@ app.post('/restaurant/login', async (req, res) => {
 
         const isMatch = await bcrypt.compare(password, restaurant.Password);
         if(!isMatch)
-            return res.status(400).json({ message: "Wrong password!" });
+            return res.status(400).json({ message: "Wrong email or password!" });
 
         res.json({ message: "Login successful!", restaurantId: restaurant.Id });
 
@@ -235,12 +288,13 @@ app.get('/restaurant-orders', async (req, res) => {
         const ordersResult = await pool.request()
             .input('RestaurantId', sql.Int, restaurantId)
             .query(`
-                SELECT o.*, u.Name AS CustomerName, u.Phone
-                FROM Orders o
-                JOIN [User] u ON o.UserId = u.Id
-                WHERE o.RestaurantId = @RestaurantId
-                ORDER BY o.Id DESC
-            `);
+                 SELECT o.*, u.Name AS CustomerName, u.Phone
+                  FROM Orders o
+                  JOIN [User] u ON o.UserId = u.Id
+                   WHERE o.RestaurantId = @RestaurantId
+                    AND o.Status <> 'Delivered'       
+                    ORDER BY o.Id DESC  `
+);
 
         const orders = ordersResult.recordset;
 
@@ -278,13 +332,23 @@ app.put('/update-order-status', async (req,res)=>{
         res.status(500).json({ success: false, error: err });
     }
 });
-app.post('/restaurant/add-menu-item', async (req,res)=>{
-    const { restaurantId, name, price, image, category, description } = req.body;
 
-    try{
+app.post(
+    '/restaurant/add-menu-item',
+    uploadMenuImage.single("image"),
+    async (req, res) => {
+
+    const { restaurantId, name, price, category, description } = req.body;
+
+    if(!req.file){
+        return res.status(400).json({ success:false, message:"Image required" });
+    }
+
+    const imagePath = `uploads/menu/${req.file.filename}`;
+
+    try {
         const pool = await sql.connect(config);
 
-        // الحصول على الـ Menu الخاصة بالمطعم
         const menuResult = await pool.request()
             .input('RestaurantId', sql.Int, restaurantId)
             .query('SELECT * FROM Menu WHERE RestaurantId=@RestaurantId');
@@ -296,38 +360,37 @@ app.post('/restaurant/add-menu-item', async (req,res)=>{
                 .input('RestaurantId', sql.Int, restaurantId)
                 .input('Name', sql.VarChar, 'Main Menu')
                 .query(`
-                    INSERT INTO Menu (RestaurantId, Name) 
-                    OUTPUT INSERTED.Id 
+                    INSERT INTO Menu (RestaurantId, Name)
+                    OUTPUT INSERTED.Id
                     VALUES (@RestaurantId, @Name)
                 `);
             menuId = newMenu.recordset[0].Id;
-        } 
-        else {
+        } else {
             menuId = menuResult.recordset[0].Id;
         }
 
-        // إدراج الـ MenuItem بالقيم الجديدة
         await pool.request()
             .input('MenuId', sql.Int, menuId)
             .input('Name', sql.VarChar, name)
             .input('Price', sql.Decimal(10,2), price)
-            .input('Image', sql.VarChar, image)
+            .input('Image', sql.VarChar, imagePath)
             .input('Category', sql.VarChar, category || null)
             .input('Description', sql.VarChar, description || null)
             .query(`
-                INSERT INTO MenuItem (MenuId, Name, Price, Image, Category, Description)
-                VALUES (@MenuId, @Name, @Price, @Image, @Category, @Description)
+                INSERT INTO MenuItem
+                (MenuId, Name, Price, Image, Category, Description)
+                VALUES
+                (@MenuId, @Name, @Price, @Image, @Category, @Description)
             `);
 
         res.json({ success:true, message:"Menu item added" });
 
     } catch(err){
         console.error(err);
-        res.status(500).json({ success:false, error:err });
+        res.status(500).json({ success:false });
     }
 });
 
-//pass 
 
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
 

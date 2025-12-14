@@ -1,15 +1,5 @@
 
-class MenuItem {
-    constructor(id, name, price, image,description) {
-      this.id = id;
-      this.name = name;
-      this.price = price;
-      this.image = image;
-      this.description=description;
-
-    }
-  }
-  function addToCart(id, name, price, image, restaurantId) {
+  function addMenuItemToCart(id, name, price, image, restaurantId) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     const existing = cart.find(i => i.id === id);
     if (existing) {
@@ -37,15 +27,11 @@ function createCard(item) {
     <h3>${item.Name}</h3>
     ${description}
     <div class="price">${item.Price} EGP</div>
-<button class="add-btn" onclick="addToCart(${item.Id}, '${item.Name}', ${item.Price}, '${item.Image}', restaurantId)">Add to Cart</button>
+<button class="add-btn" onclick="addMenuItemToCart(${item.Id}, '${item.Name}', ${item.Price}, '${item.Image}', restaurantId)">Add to Cart</button>
   `;
   return card;
 }
 
-
-function goToMenu(page) {
-  window.location.href = page;
-}
 
 function logout() {
   const confirmLogout = confirm("Are you sure you want to log out?");

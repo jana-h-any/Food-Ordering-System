@@ -41,9 +41,27 @@
 </main>
 
 <script>
+
+function isStrongPassword(password) {
+    const minLength = 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[@$!%*?&#]/.test(password);
+
+    return (
+        password.length >= minLength &&
+        hasUpper &&
+        hasLower &&
+        hasNumber &&
+        hasSpecial
+    );
+}
+
 const form = document.getElementById("registerForm");
 
 form.addEventListener("submit", async (e) => {
+    
     e.preventDefault();
 
     const data = {
@@ -60,6 +78,18 @@ form.addEventListener("submit", async (e) => {
         alert("All fields are required");
         return;
     }
+    
+    if(!isStrongPassword(data.password)){
+    alert(
+        "Password must be at least 8 characters and include:\n" +
+        "- Uppercase letter\n" +
+        "- Lowercase letter\n" +
+        "- Number\n" +
+        "- Special character (@$!%*?&#)"
+    );
+    return;
+}
+
 
     if(data.password !== data.confirmPassword){
         alert("Passwords do not match!");

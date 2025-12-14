@@ -40,7 +40,7 @@
 
         
         .order h3 {
-            color: #f39c12; /* Order # بالبرتقالي */
+            color: #f39c12; 
         }
         
         .order-items {
@@ -65,7 +65,7 @@
         }
         
         .order-item p {
-            color: #fff; /* تفاصيل العنصر أبيض */
+            color: #fff; 
             margin: 2px 0;
         }
         .txt{
@@ -135,7 +135,6 @@ async function loadHistory() {
     const orderDiv = document.createElement("div");
     orderDiv.classList.add("order");
 
-    // تحويل التاريخ إلى صيغة readable
     const date = new Date(order.CreatedAt);
     const formattedDate = date.toLocaleString();
 
@@ -168,16 +167,7 @@ async function loadHistory() {
 document.addEventListener("DOMContentLoaded", loadHistory);
 
 
-function logout() {
-  const confirmLogout = confirm("Are you sure you want to log out?");
-
-  if (confirmLogout) {
-      localStorage.removeItem("loggedIn"); 
-      localStorage.removeItem("userId");     
-      window.location.href = "logIn.html"; 
-  }
-}
 </script>
-
+<script src="js file.js"></script>
 </body>
 </html>

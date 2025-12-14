@@ -104,7 +104,7 @@ nav ul li a:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   transition: 0.3s;
   text-align: center;
-  width: 200px; /* ثابت حجم الكرت */
+  width: 200px; 
 }
 .item-card:hover {
   transform: translateY(-5px);

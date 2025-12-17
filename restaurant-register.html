@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant Register</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body.login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--primary-color);
+        }
+
+        .login-form {
+            background-color: #2c2c2c;
+            padding: 40px;
+            border-radius: 20px;
+            width: 370px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-form h2 {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .login-form input,
+        .login-form textarea {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: none;
+            background-color: #1f1f1f;
+            color: white;
+        }
+
+        .login-form textarea {
+            resize: none;
+            height: 80px;
+        }
+
+        .login-form button {
+            padding: 12px;
+            border-radius: 20px;
+            border: none;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-form button:hover {
+            background-color: #f0b133;
+        }
+
+        .error-msg {
+            color: #ff5555;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .success-msg {
+            color: #2ecc71;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .txt {
+            color: #d35400;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .txt a {
+            color: #f0b133;
+            text-decoration: none;
+        }
+        #logo {display: none;}
+
+        .custom-file-upload {  padding:12px; border-radius:10px; background: #2c2c2c; color: #7b7676; font-weight: normal;cursor: pointer;text-align: left;}
+.custom-file-upload:hover {  background: #3a3a3a; color: aliceblue;}
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">BTWEETY</div>
+    <nav>
+        <ul>
+            <li><a href="restaurant-login.html" class="login-btn">Login</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <form class="login-form" id="restaurantRegisterForm" enctype="multipart/form-data">
+        <h2>Restaurant Register</h2>
+
+        <div class="error-msg" id="errorMsg"></div>
+        <div class="success-msg" id="successMsg"></div>
+
+        <input type="text" id="name" name="name" placeholder="Restaurant Name" required>
+        <input type="email" id="email" name="email" placeholder="Owner Email" required>
+        <input type="text" id="phone" name="phone" placeholder="Phone Number" required>
+        <input type="password" id="password" name="password" placeholder="Password" required>
+        <textarea id="description" name="description" placeholder="Restaurant Description"></textarea>
+        <label class="custom-file-upload">
+            <input type="file" id="logo" name="logo" accept="image/*" required>
+            <span id="fileText">Choose file</span>
+            </label>
+        <button type="submit">Send Request</button>
+
+        <div class="txt">
+            Already have an account?
+            <a href="restaurant-login.html">Login</a>
+        </div>
+    </form>
+
+    <div class="background-image"></div>
+</main>
+
+<script>
+    const form = document.getElementById('restaurantRegisterForm');
+    const errorMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        errorMsg.textContent = '';
+        successMsg.textContent = '';
+
+        const formData = new FormData();
+        formData.append('name', document.getElementById('name').value);
+        formData.append('email', document.getElementById('email').value);
+        formData.append('phone', document.getElementById('phone').value);
+        formData.append('password', document.getElementById('password').value);
+        formData.append('description', document.getElementById('description').value);
+        formData.append('logo', document.getElementById('logo').files[0]);
+
+        try {
+            const res = await fetch('http://localhost:3000/restaurant/register', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await res.json();
+
+            if(res.ok){
+                successMsg.textContent = "Request sent! Waiting for admin approval.";
+                form.reset();
+            } else {
+                errorMsg.textContent = result.message || "Error";
+            }
+        } catch(err){
+            console.error(err);
+            errorMsg.textContent = "Server error";
+        }
+    });
+</script>
+
+</body>
+</html>

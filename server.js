@@ -115,7 +115,7 @@ app.post('/login', async (req, res) => {
 app.get('/restaurants', async (req, res) => {
   try {
       const pool = await sql.connect(config);
-      const result = await pool.request().query('SELECT * FROM Restaurant');
+      const result = await pool.request().query("SELECT * FROM Restaurant WHERE Status= 'Approved' ");
       res.json(result.recordset);
   } catch(err){
       console.error(err);
@@ -131,7 +131,7 @@ app.post("/create-order", async (req, res) => {
         const orderResult = await pool.request()
             .input("UserId", sql.Int, userId)
             .input("RestaurantId", sql.Int, restaurantId)
-            .input("AddressId", sql.Int, addressId) // <-- هنا
+            .input("AddressId", sql.Int, addressId) 
             .input("TotalPrice", sql.Decimal(10,2), totalPrice)
             .query(`
                 INSERT INTO Orders (UserId, RestaurantId, AddressId, TotalPrice)
@@ -270,7 +270,7 @@ app.post('/restaurant/login', async (req, res) => {
 
         const isMatch = await bcrypt.compare(password, restaurant.Password);
         if(!isMatch)
-            return res.status(400).json({ message: "Wrong email or password!" });
+            return res.status(400).json({ message: "Wrong name or password!" });
 
         res.json({ message: "Login successful!", restaurantId: restaurant.Id });
 
@@ -391,6 +391,141 @@ app.post(
     }
 });
 
+ 
+
+const logoStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/logos"); 
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `logo_${Date.now()}${ext}`);
+    }
+});
+
+const uploadLogo = multer({
+    storage: logoStorage,
+    fileFilter: (req, file, cb) => {
+        if(!file.mimetype.startsWith("image/")) {
+            return cb(new Error("Only images allowed"));
+        }
+        cb(null, true);
+    }
+});
+
+
+
+app.post('/restaurant/register', uploadLogo.single('logo'), async (req, res) => {
+    const { name, email, phone, password, description } = req.body;
+    const logo = req.file;
+
+    if (!logo) {
+        return res.status(400).json({ message: "Logo is required" });
+    }
+
+    try {
+        const pool = await sql.connect(config);
+
+        const existing = await pool.request()
+            .input('name', sql.VarChar, name)
+            .query('SELECT * FROM Restaurant WHERE Name=@name');
+
+        if (existing.recordset.length > 0) {
+            return res.status(400).json({ message: "Restaurant already exists" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await pool.request()
+            .input('name', sql.VarChar, name)
+            .input('email', sql.VarChar, email)
+            .input('phone', sql.VarChar, phone)
+            .input('password', sql.VarChar, hashedPassword)
+            .input('description', sql.VarChar, description || null)
+            .input('logo', sql.VarChar, logo.path) 
+            .query(`
+                INSERT INTO Restaurant
+                (Name, OwnerEmail, OwnerPhone, Password, Description, Image, Status)
+                VALUES
+                (@name, @email, @phone, @password, @description, @logo, 'Pending')
+            `);
+
+        res.json({ message: "Restaurant request submitted successfully" });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+
+//Admin 
+
+app.post('/admin/login', async (req, res) => {
+    const { name, password } = req.body;
+
+    try {
+        const pool = await sql.connect(config);
+
+        const result = await pool.request()
+            .input('name', sql.VarChar, name)
+            .query('SELECT * FROM Admin WHERE Name=@name');
+
+        if (result.recordset.length === 0) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        const admin = result.recordset[0];
+
+        const isMatch = await bcrypt.compare(password, admin.Password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        res.json({ message: "Admin login successful", adminId: admin.Id });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+
+
+app.get('/admin/restaurant-requests', async (req, res) => {
+    try {
+        const pool = await sql.connect(config);
+
+        const result = await pool.request()
+            .query("SELECT * FROM Restaurant WHERE Status='Pending'");
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        res.status(500).json({ message: "Server error" });
+    }
+});
+app.put('/admin/restaurant-status', async (req, res) => {
+    const { restaurantId, status } = req.body; 
+
+    try {
+        const pool = await sql.connect(config);
+
+        await pool.request()
+            .input('id', sql.Int, restaurantId)
+            .input('status', sql.VarChar, status)
+            .query(`
+                UPDATE Restaurant
+                SET Status=@status
+                WHERE Id=@id
+            `);
+
+        res.json({ message: "Restaurant status updated" });
+
+    } catch (err) {
+        res.status(500).json({ message: "Server error" });
+    }
+});
 
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
 

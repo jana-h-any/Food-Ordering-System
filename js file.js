@@ -57,7 +57,3 @@ if (loggedSection && guestSection) {
 }
 
 
-function guestExplore() {
-  alert("Please login first to explore restaurants!");
-  window.location.href = "logIn.html"; 
-}

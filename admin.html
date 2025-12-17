@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body.admin-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--primary-color);
+    font-family: Arial, sans-serif;
+}
+
+header {
+    width: 100%;
+    background-color: #2c2c2c;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #f0b133;
+}
+
+header .logo {
+    font-weight: bold;
+    font-size: 24px;
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+header nav ul li a {
+    color: #f0b133;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+h2 {
+    color: #f0b133;
+    margin: 20px 0;
+}
+
+table {
+    border-collapse: collapse;
+    width: 90%;
+    max-width: 900px;
+    background-color: #2c2c2c;
+    color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+th {
+    background-color: #1f1f1f;
+}
+
+tr:nth-child(even) {
+    background-color: #3a3a3a;
+}
+
+button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button.approve { background-color: #28a745; color: white; }
+button.reject { background-color: #dc3545; color: white; }
+
+button:hover { opacity: 0.8; }
+</style>
+</head>
+<body class="admin-page">
+
+<header>
+    <div class="logo">BTWEETY Admin</div>
+    <nav>
+        <ul>
+            <li><a href="adminLogin.html" id="logoutBtn">Logout</a></li>
+        </ul>
+    </nav>
+</header>
+
+<h2>Pending Restaurants</h2>
+
+<table id="restaurantsTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script>
+const tableBody = document.querySelector('#restaurantsTable tbody');
+
+async function loadPendingRestaurants() {
+    try {
+        const res = await fetch('http://localhost:3000/admin/restaurant-requests');
+        const restaurants = await res.json();
+
+        tableBody.innerHTML = '';
+        restaurants.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${r.Name}</td>
+                <td>${r.OwnerEmail}</td>
+                <td>${r.OwnerPhone}</td>
+                <td>${r.Status}</td>
+                <td>
+                    <button class="approve" onclick="updateStatus(${r.Id}, 'Approved')">Approve</button>
+                    <button class="reject" onclick="updateStatus(${r.Id}, 'Rejected')">Reject</button>
+                </td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+    } catch(err) {
+        console.error(err);
+        alert('Cannot load pending restaurants.');
+    }
+}
+
+// Update restaurant status
+async function updateStatus(id, status) {
+    try {
+        const res = await fetch('http://localhost:3000/admin/restaurant-status', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ restaurantId: id, status })
+        });
+
+        const data = await res.json();
+        if(data.message === "Restaurant status updated") loadPendingRestaurants();
+        else alert('Error updating status');
+    } catch(err) {
+        console.error(err);
+        alert('Server error');
+    }
+}
+
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', ()=> {
+    localStorage.removeItem('adminId');
+    window.location.href='admin-login.html';
+});
+
+// Load on page load
+loadPendingRestaurants();
+</script>
+
+</body>
+</html>

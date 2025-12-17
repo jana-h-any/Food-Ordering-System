@@ -217,6 +217,7 @@ body.register-page .login-form {
 /* ============================= */
 /*      Animation               */
 /* ============================= */
+
 body.animate-out .background-image {
     transform: translateX(100%);
     transition: transform 0.8s ease;
